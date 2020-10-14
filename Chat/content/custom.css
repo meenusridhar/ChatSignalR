@@ -1,0 +1,1040 @@
+﻿/* custom styles by Hassan */
+.mt30 {
+    margin-top: 30px !important;
+}
+
+.pull-right {
+    float: right;
+}
+
+/*body {
+    display: block;
+    font-family: sans-serif;
+}*/
+
+.container {
+    position: relative;
+}
+
+.container::before {
+    content: "";
+    background-image: url('../images/bgPattern.png');
+    background-repeat: no-repeat;
+    background-position: 53% -60px;
+    background-size: 191%;
+    display: block;
+    opacity: 0.2;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    z-index: -1;
+}
+
+.banner {
+    background-image: url(../Images/two.png);
+    background-repeat: no-repeat;
+    background-size: 100%;
+    background-position: 0px -36px;
+    height: 150px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-content: center;
+    position: relative;
+    z-index: 0;
+}
+
+.banner::before {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+.banner.newStaff {
+    background-position: 0px -36px;
+    background-image: url('../Images/two.png');
+}
+
+.banner.newStaff::before {
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#000000+0,000000+100&0.65+0,0+100 */
+    background: -moz-linear-gradient(45deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(45deg, rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(45deg, rgba(0,0,0,0.65) 0%,rgba(0,0,0,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a6000000', endColorstr='#00000000',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+}
+
+.banner.settings h3,
+.banner.newStaff h3 {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 0;
+}
+
+.banner.newStaff a.backButton span.icon-arrow-left2,
+.banner.settings a.backButton span.icon-arrow-left2 {
+    top: 0px;
+}
+
+h3 {
+    text-align: center;
+    display: block;
+    font-size: 30px;
+    font-family: 'Roboto Slab', serif;
+    letter-spacing: 2px;
+    z-index: 2;
+    text-shadow: 0px 3px 3px rgba(0,0,0,0.6);
+    /*  
+    background: #6f98ab;  
+    background: -moz-linear-gradient(top,  #6f98ab 0%, #00547a 50%, #067fae 100%); 
+    background: -webkit-linear-gradient(top,  #6f98ab 0%,#00547a 50%,#067fae 100%);  
+    background: linear-gradient(to bottom,  #6f98ab 0%,#00547a 50%,#067fae 100%);  
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#6f98ab', endColorstr='#067fae',GradientType=0 ); */
+    color: #fff;
+}
+
+ul.files {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    /*justify-content: space-around;*/
+    list-style: none;
+    margin: 30px 0 0;
+    padding: 0 20px;
+}
+
+ul.files li {
+    width: 130px;
+    margin-bottom: 20px;
+    /* background-color :#4d4dff; */
+    background-color: #5656ec;
+    transition: all 200ms ease-in;
+    border: 4px solid rgba(255,255,255,0.5);
+    margin: 0 13px 25px;
+}
+
+ul.files li:hover {
+    border-color: #5656ec;
+    box-shadow: 0 9px 34px #5656ec;
+}
+
+ul.files li a {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    padding: 0 5px;
+    text-decoration: none;
+    color: #fff;
+    width: 100%;
+    height: 135px;
+    box-sizing: border-box;
+}
+
+ul.files li a span {
+    color: #ffffff;
+    font-size: 70px;
+    margin: 13px 0 0;
+}
+
+ul.files li a span.icon-promotion {
+    font-size: 45px;
+}
+
+ul.files li a span.icon-recureReq,
+ul.files li a span.icon-salaryCertificate {
+    font-size: 60px;
+    margin-top: 5px;
+}
+
+ul.files li a span.icon-StationaryReq {
+    font-size: 58px;
+}
+
+ul.files li a span.icon-leaveHours {
+    font-size: 50px;
+    margin-top: 5px;
+    margin-left: 10px;
+}
+
+ul.files li a span.icon-leaveBefore24 {
+    font-size: 55px;
+}
+
+ul.files li a span.icon-leaveNotification {
+    margin-left: 10px;
+}
+
+ul.files li a p {
+    font-family: 'Roboto Slab', serif;
+    color: #fff;
+    font-size: 17px;
+    font-weight: 600;
+    display: inline-block;
+    letter-spacing: 2px;
+    width: 100%;
+    margin: 12px 0;
+}
+
+.info {
+    display: none;
+}
+
+    .info.show {
+        display: block;
+    }
+
+.tooltip {
+    display: none;
+    position: absolute;
+    border: 1px solid #333;
+    background-color: #161616;
+    border-radius: 5px;
+    padding: 15px 15px;
+    color: #fff;
+    font-size: 16px;
+    box-shadow: 3px 5px 10px rgba(0,0,0,0.4);
+    border: 1px solid #545454;
+    letter-spacing: 0.5px;
+}
+
+ul.linkOpt {
+    list-style: outside none none;
+    padding: 0;
+    text-align: center;
+}
+
+    ul.linkOpt li {
+        display: inline-block;
+    }
+
+        ul.linkOpt li a {
+            color: #00a9ff;
+            padding: 10px;
+            text-decoration: none;
+        }
+
+.tabsLayout ul.nav.nav-tabs li a i.icon-leaveReturn {
+    padding-left: 7px;
+}
+
+.tabsLayout ul.nav.nav-tabs li a i.icon-user-plus {
+    padding-left: 5px;
+}
+
+.tabsLayout ul.nav.nav-tabs li a i.icon-images {
+    font-size: 24px;
+}
+/***************  2nd option **************/
+
+.container.sec ul.files li {
+    border: 0 none;
+    border-radius: 11px;
+    margin: 0 17px 25px;
+    background-color: #01557C;
+}
+
+    .container.sec ul.files li:hover {
+        background-color: #078abc;
+        box-shadow: none;
+    }
+
+/*************** Chat Styles **************/
+/*html {
+    height: 100%;
+}*/
+
+body { 
+    margin: 0;
+    padding: 0
+}
+
+.chatForm {
+    height: 100vh;
+}
+.mainContainer {
+    margin:0;
+}
+.mainContainerChat {
+    display: flex;
+    flex-direction: row;
+    height: calc(100vh - 118px);
+    max-height: 100vh;
+    margin-top: 118px;
+}
+
+.asideThreads {
+    min-width: 250px;
+    max-width: 250px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    box-sizing: border-box;
+    position:relative;
+}
+.toggleUsersList {
+    cursor: pointer;
+    display: inline-block;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+.chatHead {
+    display: flex;
+    background-color: #fff;
+    flex-direction: row;
+    align-items: center;
+    min-height: 69px;
+}
+
+.user {
+    align-items: center;
+    border-bottom: 1px solid #dae0e8;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    padding: 20px;
+    margin: 0 0 15px;
+    min-height: 150px;
+    box-sizing: border-box;
+}
+
+div#divUsers {
+    flex-grow: 3;
+    overflow-y: auto;
+    display: inline-flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+}
+
+.userAvatar {
+    display: inline-flex;
+    height: 100px;
+    position: relative;
+    width: 100px;
+    margin: 0 0 15px;
+    text-align: center;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.userAvatar img {
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    z-index: 99999;
+}
+
+#divMsgs {
+    min-height: 200px;
+    overflow: auto;
+    flex-grow: 4;
+}
+
+.userAvatar::before {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: #bcd4ff;
+    border-radius: 50%;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.userAvatar::after {
+    content: "\e9b9";
+    font-family: 'icomoon';
+    font-size: 56px;
+    color: #fff;
+    position: absolute;
+    z-index: 1;
+    line-height: 18px;
+}
+
+.user #spnMySelf {
+    color: #2d2f33;
+    font-weight: bold;
+    text-transform: uppercase;
+    width: 100%;
+    text-align: center;
+}
+
+.toAvatar {
+    border: 2px solid #bcd4ff;
+    border-radius: 50%;
+    display: inline-block;
+    height: 45px;
+    width: 45px;
+    overflow: hidden;
+    position: relative;
+    margin: 10px 10px 10px;
+}
+
+.toAvatar::after {
+    content: "\e9b9";
+    font-family: 'icomoon';
+    font-size: 32px;
+    color: #ddd;
+    position: absolute;
+    left: 50%;
+    margin-left: -16px;
+    z-index: 9999;
+    top: 12px;
+    line-height: 18px;
+}
+
+.toAvatar img {
+    height: auto;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    border: 2px solid #fff;
+    z-index: 99999;
+}
+
+.chatHead a.backButton {
+    color: #363a40;
+    display: block;
+    margin: 0 10px;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.chatContainer {
+    flex-grow: 3;
+    background-color: #ebf1fb;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid #dae0e8;
+    position: relative;
+}
+
+.asideThreads div#divUsers span {
+    box-sizing: border-box;
+    color: #a3c0f1;
+    cursor: pointer;
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 0 10px;
+    min-height: 22px;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+
+    .asideThreads div#divUsers span.active {
+        font-style: italic;
+    } 
+    .asideThreads div#divUsers span i {
+        transform: rotate(-90deg);
+        font-size: 15px;
+        transition: all 100ms ease-in-out;
+    } 
+    .asideThreads div#divUsers span.active i {
+        transform: rotate(0deg);
+    }
+
+.asideThreads div#divUsers ul#ulUsers {
+    display:flex;
+    flex-direction:column;
+    list-style: outside none none;
+    margin: 0 0 10px;
+    padding: 0;
+}
+
+.asideThreads ul#ulUsers li {
+    padding: 10px 0 10px 40px;
+    position: relative;
+}
+
+.asideThreads ul#ulUsers li:hover {
+    background-color: #f1f6ff;
+}
+
+.asideThreads ul#ulUsers li.OnlineUsers {
+    cursor: pointer;
+}
+
+.asideThreads ul#ulUsers li.OnlineUsers.active {
+    background-color: #f1f6ff;
+    cursor: inherit;
+}
+
+.asideThreads ul#ulUsers li::before {
+    content: "\e9b9";
+    font-family: 'icomoon';
+    font-size: 16px;
+    color: #ddd;
+    position: absolute;
+    left: 9px;
+    z-index: 9999;
+    top: 8px;
+    line-height: 18px;
+}
+
+.asideThreads ul#ulUsers li::after {
+    content: "";
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    border: 1px solid #ddd;
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    border-radius: 25px;
+}
+
+.asideThreads ul#ulUsers li.OnlineUsers {
+    color: #000;
+    order: -1;
+    text-decoration: none;
+}
+
+.asideThreads ul#ulUsers li.OnlineUsers::before {
+    color: rgba(255,255,255,0.4)
+}
+
+.asideThreads ul#ulUsers li.OnlineUsers::after {
+    background-color: #518fff;
+    border-color: #518fff;
+}
+
+#divChatUser, #divMsgs {
+    padding: 0 10px
+}
+
+span.OnlineUsers {
+    font-family: sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    color: #518fff;
+    margin-left: 10px;
+}
+
+span#spnconid {
+    font-family: sans-serif;
+    color: #545454;
+}
+
+.OfflineUsers {
+    text-decoration: none;
+    cursor: default;
+    color: gray;
+}
+
+#divSend {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    box-sizing: border-box;
+    position: absolute;
+    border-top: 1px solid #DAE0E8;
+    bottom: 0;
+    left: 0;
+    height: 75px;
+    padding: 10px 40px;
+    width: 100%;
+}
+
+#divSend textarea {
+    background-color: transparent;
+    border-color: transparent;
+    flex-grow: 2;
+    font-family: sans-serif;
+    font-size: 14px;
+    resize: none;
+    outline: none;
+    overflow: auto;
+    transition: all 100ms ease-in-out;
+}
+
+.sendFile {
+    position: relative;
+}
+
+.sendFile label[for="btnSendFile"] {
+    border: 1px solid #518fff;
+    border-radius: 50%;
+    color: #518fff;
+    cursor: pointer;
+    display: block;
+    font-size: 18px;
+    height: 35px;
+    line-height: 37px;
+    margin: 8px 10px 0;
+    text-align: center;
+    transition: all 200ms ease-in-out 0s;
+    width: 35px;
+}
+
+.sendFile label[for="btnSendFile"]:focus,
+.sendFile label[for="btnSendFile"]:active,
+.sendFile label[for="btnSendFile"]:hover {
+    background-color: #518fff;
+    color: #fff;
+    box-shadow: 0 5px 15px rgba(63, 168, 255, 0.7);
+}
+
+.sendFile input[type=file] {
+    position: absolute;
+    opacity: 0;
+    visibility: hidden;
+    width: 0;
+    height: 0;
+    top: -22px;
+    left: -22px;
+}
+
+button#btnSend {
+    border: 0 none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 22px;
+    height: 52px;
+    line-height: 16px;
+    width: 52px;
+    color: #fff;
+    background-color: #5893ff;
+    padding: 0 4px 1px 0px;
+}
+
+    button#btnSend:hover,
+    button#btnSend:focus,
+    button#btnSend:active {
+        box-shadow: 0 5px 15px rgba(63, 168, 255, 0.7);
+    }
+
+textarea::-webkit-input-placeholder {
+    color: #0052f7;
+    margin-top: 20px;
+}
+
+textarea:-moz-placeholder {
+    /* Firefox 18- */
+    color: #0052f7;
+    margin-top: 20px;
+    opacity: 1;
+}
+
+textarea::-moz-placeholder {
+    /* Firefox 19+ */
+    color: #0052f7;
+    margin-top: 20px;
+    opacity: 1;
+}
+
+textarea:-ms-input-placeholder {
+    /* IE 10+ */
+    color: #0052f7;
+    margin-top: 20px;
+    opacity: 1;
+}
+
+textarea::-ms-input-placeholder {
+    /* Edge */
+    color: #0052f7;
+    margin-top: 20px;
+    opacity: 1;
+}
+
+textarea:placeholder-shown {
+    /* Standard one last! */
+    color: #0052f7;
+    margin-top: 20px;
+    opacity: 1;
+}
+
+#divSend.active {
+    background-color: #fff;
+    box-shadow: 0 0px 15px rgba(63, 168, 255, 0.4);
+}
+
+#divChatUser {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    background-color: #fff;
+}
+
+.chatBox div a img {
+    max-width: 100%;
+}
+
+inspector-stylesheet:1 .chatBox div a {
+    display: inline-block;
+}
+
+.badge1 {
+    position: relative;
+}
+
+.badge1[data-badge]:after {
+    content: attr(data-badge);
+    position: absolute;
+    top: -10px;
+    right: -20px;
+    font-size: .7em;
+    background: blue;
+    color: white;
+    width: 18px;
+    height: 18px;
+    text-align: center;
+    line-height: 18px;
+    border-radius: 50%;
+    box-shadow: 0 0 1px #333;
+}
+
+.asideThreads div#divUsers span.mybadge {
+    width: 18px;
+    display: inline-block;
+    float: right;
+    margin: -2px 10px 0 0;
+    padding: 0;
+    text-align: center;
+    background-color: #ffb100;
+    color: #fff;
+    border-radius: 50%;
+    line-height: 18px;
+}
+
+.ui-progressbar {
+    height: 20px;
+}
+
+.tn {
+    border: 1px solid blue; /* Gray border */
+    border-radius: 4px; /* Rounded border */
+    padding: 5px; /* Some padding */
+    width: 150px; /* Set a small width */
+}
+
+tn:hover {
+    box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);
+}
+
+#divMsgs {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    padding: 30px 65px 0;
+    margin-bottom: 75px;
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ebf1fb+0,ffffff+100 */
+    background: rgb(235,241,251); /* Old browsers */
+    background: -moz-linear-gradient(top, rgba(235,241,251,1) 0%, rgba(255,255,255,1) 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, rgba(235,241,251,1) 0%,rgba(255,255,255,1) 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom, rgba(235,241,251,1) 0%,rgba(255,255,255,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ebf1fb', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */
+}
+
+#divMsgs div {
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+    max-width: 470px;
+    margin-bottom: 10px;
+    line-height: 16px;
+}
+
+#divMsgs div.res {
+    align-self: flex-start;
+    background-color: #7cbeff;
+    border-radius: 7px;
+    padding: 10px 12px;
+    position: relative;
+}
+
+#divMsgs div.res::before {
+    position: absolute;
+    content: '';
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-right: 10px solid #7cbeff;
+    border-bottom: 5px solid transparent;
+    left: -10px;
+    top: 5px;
+}
+
+#divMsgs div.snd {
+    position: relative;
+    align-self: flex-end;
+    background-color: #fff;
+    border-radius: 7px;
+    padding: 10px 12px 7px;
+}
+
+#divMsgs div.snd::before {
+    position: absolute;
+    content: '';
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-left: 10px solid #fff;
+    border-bottom: 5px solid transparent;
+    right: -10px;
+    top: 5px;
+}
+/************** emoji styles **************/
+.sendEmo {
+    border-radius: 50%;
+    color: #A8D0FF;
+    cursor: pointer;
+    display: block;
+    font-size: 28px;
+    height: 35px;
+    line-height: 37px;
+    margin: 10px 0px 0;
+    text-align: center;
+    transition: all 200ms ease-in-out 0s;
+    width: 35px;
+    position: relative;
+    cursor:not-allowed;
+}
+
+.sendEmo:hover .emjBox {
+    visibility: visible;
+    opacity: 1;
+    bottom: 46px;
+}
+
+.emjBox {
+    background-color: #fff;
+    bottom: 56px;
+    left: 50%;
+    margin-left: -92px;
+    box-shadow: 0 0 15px;
+    position: absolute;
+    width: 183px;
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    transition: all 250ms ease-in-out;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.emjBox::before {
+    content: "";
+    display: block;
+    position: absolute;
+    bottom: -8px;
+    right: 50%;
+    margin-right: -8px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 12px solid #fff;
+}
+
+.emjBox ul {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    list-style: outside none none;
+    margin: 0;
+    padding: 0;
+}
+
+.emjBox ul li {
+    margin-bottom: 10px;
+}
+
+.emjBox ul li span {
+    float: left;
+    font-size: 30px;
+    /* Color fallback */
+    color: #bc9af1; 
+}
+
+.emjBox ul li span.icon-thumb-up2, .emjBox ul li span.icon-thumb-down2 {
+    -webkit-text-fill-color: #a8d0ff;
+    background-clip: inherit;
+    color: #a8d0ff;
+    background: transparent;
+}
+
+.loadOld {
+    cursor: pointer;
+    font-style: italic;
+    background-color: #bf8fff;
+    color: #fff;
+    border-radius: 9px;
+    text-align: center;
+    padding: 1px;
+    font-size: 15px;
+    text-decoration: none;
+    margin: 0 0 10px;
+}
+
+.Strfromdate {
+    display: none;
+}
+/* new date and time styles */
+span.fullTime {
+    display: flex;
+    flex-direction: row-reverse;
+    position: relative;
+}
+
+span.fullTime span.time,
+span.fullTime span.date {
+    font-size: 12px;
+    color: #616161;
+    margin-left: 13px;
+    position: relative;
+}
+
+span.fullTime span.date::before {
+    font-family: 'FontAwesome';
+    content: "\f073";
+    font-size: 1em;
+    font-weight: normal;
+    left: -5px;
+    position: relative;
+    bottom: 1px;
+    color: #bf8fff;
+}
+
+span.fullTime span.time::before {
+    font-family: 'FontAwesome';
+    content: "\f017";
+    font-size: 1.2em;
+    font-weight: normal;
+    left: -5px;
+    position: relative;
+    bottom: -1px;
+    color: #5893ff;
+}
+/*footer {
+    display:none;
+}*/
+span.toggleUsersList.fa-arrow-right   {
+    display:none;
+}
+span.fa-angle-left.slideBack  {
+    display:none;
+}
+
+@media all and (max-width: 991px) {
+
+} 
+@media all and (max-width: 767px) {
+  
+} 
+@media all and (max-width: 479px) {
+    div.mainContainerChat { 
+        height: calc(100vh - 55px);
+        max-height: 100vh;
+        overflow:hidden;
+    }
+    div.asideThreads {
+        min-width : 100% ;
+        max-width : 100% ; 
+        transition : transform 300ms ease-in-out;
+    }
+    div.chatContainer {
+        min-width: 100%;
+        max-width: 100%;
+        transition: transform 300ms ease-in-out;
+    } 
+    div.asideThreads.slideHide {
+        transform: translateX(-100%);
+    }
+    div.chatContainer.slideShow {
+        transform: translateX(-100%);
+    }
+    div#divMsgs {
+        padding : 20px 20px 0;
+    }
+    div#divSend {
+        padding : 10px;
+    }
+    span.fa-angle-left.slideBack {
+        display: inline-block;
+        font-size: 2em;
+        color: #5893ff;
+    }
+    div#divChatUser {
+        padding:0; 
+    }
+    div.user {
+        padding: 10px;
+        position: relative;
+        min-height: 100px;
+        background-image: url('../../images/top_banner-3.png');
+        background-size: cover;
+    }
+    div.userAvatar {
+        width:80px;
+        height:80px;
+        margin:0;
+    } 
+    span.toggleUsersList.fa-arrow-right {
+        display: inline-block;
+        font-size: 1.5em;
+        color: #518fff;
+        height: 26px;
+        top: 50%;
+        margin-top: -17px;
+    }
+    .skmFrame1 {
+        margin-bottom: 100px;
+    }
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
