@@ -1,0 +1,547 @@
+﻿Imports Microsoft.VisualBasic
+Imports Microsoft.AspNet.SignalR
+Imports System.Threading.Tasks
+Imports System.Data
+Imports System.Data.SqlClient
+Imports HRD
+
+Public Class ChatService
+    Inherits PersistentConnection
+
+    Protected Overrides Async Function OnConnected(request As IRequest, connectionId As String) As Task
+        ' Dim pfnum As Integer = 8817
+        Dim UserFrom As Int64 = 0, UserTo As Int64 = 0
+        Dim MsgID As Int64 = 0, Roomid As Int64 = 0
+        Dim message As New Dictionary(Of String, String)
+        Dim pfnum As Integer = request.QueryString("pfnum")
+        ' Dim pfnum As Integer
+        pfnum = 8817
+        If pfnum <> 0 Then
+
+            Dim objEnt As New ChatEntities()
+            Dim objChatUser As New ChatUsers()
+            objChatUser = (From c In objEnt.ChatUsers.Where(Function(o) o.PFNum = pfnum) Select c).FirstOrDefault()
+            'End If
+            If objChatUser IsNot Nothing Then
+                objChatUser.IsOnline = True
+                objChatUser.connId = connectionId
+                objChatUser.CreatedOn = DateTime.Now
+                objEnt.SaveChanges()
+
+            Else
+                Dim objchat As New ChatUsers
+                objchat.PFNum = pfnum
+                objchat.IsOnline = True
+                objchat.connId = connectionId
+                objchat.CreatedOn = DateTime.Now
+                objEnt.ChatUsers.Add(objchat)
+                objEnt.SaveChanges()
+                ''
+            End If
+
+            Dim con As New SqlConnection(ConfigurationManager.ConnectionStrings("MYSKM").ConnectionString)
+            con.Open()
+            Dim cmd As New SqlCommand
+            cmd.Connection = con
+            cmd.CommandType = CommandType.Text
+            Dim chatusername As String = String.Empty
+            Dim Qry As String
+            Dim myskmusers As New List(Of ChatUser)
+            '' Need to check which user is logged in - If logged in user is not into HR team then display HR Users
+            Dim IsHRUser As Integer = 0
+            IsHRUser = (From c In objEnt.userlist.Where(Function(x) x.PFNum = pfnum And (x.department = "HRD" Or x.department = "IT"))).Count
+            If IsHRUser > 0 Then
+                Qry = <string>
+                                 SELECT U.firstname + ' ' + U.lastname as username, U.PFNum,  case when OU.IsOnline= 1 then 1 else 0 end as IsOnline, isnull(OU.ConnId,'') as connId, case when U.PFNum=<%= pfnum %> then 1 else 0 end as itsme 
+                                 FROM userlist U LEFT JOIN ChatUsers OU on OU.pfnum = u.PFNum 
+                                 WHERE u.ActiveUser=1 and u.emailAdd1 != '' and U.emailAdd1 is not null and U.PFNum!=<%= pfnum %> and U.department in('HRD','IT')  ORDER BY username
+                            </string>
+            Else
+                Qry = <string>
+                                 SELECT U.firstname + ' ' + U.lastname as username, U.PFNum,  case when OU.IsOnline= 1 then 1 else 0 end as IsOnline, isnull(OU.ConnId,'') as connId, case when U.PFNum=<%= pfnum %> then 1 else 0 end as itsme 
+                                 FROM userlist U LEFT JOIN ChatUsers OU on OU.pfnum = u.PFNum 
+                                 WHERE u.ActiveUser=1 and u.emailAdd1 != '' and U.emailAdd1 is not null and U.department='HRD'  ORDER BY username
+                            </string>
+
+            End If
+
+
+            'Qry = <string>
+            '                     SELECT U.firstname + ' ' + U.lastname as username, U.PFNum, case when OU.pfnum is null then 0 else 1 end as IsOnline, isnull(OU.ConnId,'') as connId, case when U.PFNum=<%= pfnum %> then 1 else 0 end as itsme 
+            '                     FROM userlist U LEFT JOIN ChatUsers OU on OU.pfnum = u.PFNum 
+            '                     WHERE OU.IsOnline=1 and u.ActiveUser=1 and u.emailAdd1 != '' and U.emailAdd1 is not null and U.department='IT'  ORDER BY username
+            '               </string>
+
+
+
+            cmd.CommandText = Qry
+            Dim rdr As SqlDataReader = cmd.ExecuteReader
+            While rdr.Read
+                If rdr("itsme") = "1" Then
+                    chatusername = rdr("username")
+                Else
+                    Dim user As ChatUser
+                    user.connId = rdr("connId")
+                    user.pfnum = rdr("pfnum")
+                    user.username = rdr("username")
+                    user.IsOnline = rdr("IsOnline")
+                    myskmusers.Add(user)
+                End If
+            End While
+            rdr.Close()
+
+            cmd.Dispose()
+
+            con.Close()
+            con.Dispose()
+
+            ''Get the unread messages if anything pending for the user- added by Meenatchi Sridharan on 25th May 2017
+            'Dim objChRoom As New ChatRoom
+            'Dim recordexists = (From c In objEnt.ChatRoom.Where(Function(x) x.SenderID = pfnum Or x.ReceiverID = pfnum)).Count
+            'If recordexists > 0 Then
+            '    Dim query = (From CR In objEnt.ChatRoom Join CM In objEnt.ChatMapping On CM.RoomID Equals CR.RoomID Where ((CR.SenderID = pfnum Or CR.ReceiverID = pfnum) And (CR.SenderID <> 0 Or CR.ReceiverID <> 0) And (CM.IsRead = 0)) Select New With {CM.MessageID, CR.RoomID, CR.SenderID}).ToList()
+            '    ' query = query.GroupBy(Function(x) x.RoomID And x.SenderID)
+            '    Dim groups = query.GroupBy(Function(n) n.RoomID).[Select](Function(n) New With {Key .RoomID = n.Key, Key .MessageID = n.Count(), Key .SenderID = n.ToList()}).OrderBy(Function(n) n.RoomID).ToList()
+
+            'End If
+            ''Get the unread messages if anything pending for the user- added by Meenatchi Sridharan on 25th May 2017
+
+
+
+
+            'Dim temp As String = " <div>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</div> <div> Lorem Ipsum has been the industs </div> <div>standard dummy text ever since the 1500s, </div> <div> when an unknown printer took a galley of type  </div> <div> and scrambled it to make a type specimen book.  </div> <div> It has survived not only five centuries, </div> <div> but also the leap into electronic typesetting, </div> <div> remaining essentially unchanged.  </div> <div> It was popularised in the 1960s with the release of Letraset sheets  </div> <div> containing Lorem Ipsum passages,  </div> <div> and more recently with desktop publishing software like  </div> <div> Aldus PageMaker including versions of Lorem Ipsum   </div> "
+
+            'New user connected, load all the users to his screen
+            Dim message2 As New Dictionary(Of String, Object)
+            message2.Add("type", "connected")
+            message2.Add("message", "Hello HR!")
+            message2.Add("myusername", chatusername)
+            message2.Add("onlineusers", myskmusers)
+            Await MyBase.Connection.Send(connectionId, message2)
+
+            'Notify other connected users and change this users's name to green on their screens
+
+            message.Add("type", "newuser")
+            message.Add("username", chatusername)
+            'message.Add("IsAuthenticate", request.User.Identity.IsAuthenticated.ToString)
+            'message.Add("AuthType", request.User.Identity.AuthenticationType)
+            'message.Add("uri", request.Url.AbsolutePath)
+            message.Add("pfnum", pfnum)
+            message.Add("connId", connectionId)
+        Else
+
+        End If
+
+        Await MyBase.Connection.Broadcast(message, connectionId)
+
+    End Function
+    Protected Overrides Function OnDisconnected(request As IRequest, connectionId As String, stopCalled As Boolean) As Threading.Tasks.Task
+        Dim objChatusr As New ChatUsers
+        Using objEnt As New ChatEntities
+
+            objChatusr = (From c In objEnt.ChatUsers.Where(Function(x) x.connId = connectionId)).FirstOrDefault
+            If objChatusr IsNot Nothing Then
+                objChatusr.IsOnline = False
+                objEnt.SaveChanges()
+            End If
+
+        End Using
+
+        Dim message As New Dictionary(Of String, String)
+        message.Add("type", "disconnected")
+        message.Add("connId", connectionId)
+        ' message.Add("pfnum", pfnum)
+        message.Add("pfnum", objChatusr.PFNum)
+
+        Return MyBase.Connection.Broadcast(message)
+        'Return MyBase.OnDisconnected(request, connectionId, stopCalled)
+    End Function
+
+    Protected Overrides Function OnReceived(request As IRequest, connectionId As String, data As String) As Threading.Tasks.Task
+
+        Dim O As Object = Newtonsoft.Json.JsonConvert.DeserializeObject(data)
+
+        Dim UserFrom As Int64 = 0, UserTo As Int64 = 0
+        Dim MsgID As Int64 = 0, Roomid As Int64 = 0, msgReadStatus As Integer = 0
+
+        Dim ToConnId As String = O("toconnid")
+        msgReadStatus = O("msgStatus")
+        Dim message As New Dictionary(Of String, String)
+        Dim dictobj As New Dictionary(Of String, Object)
+        ' Dim ToConnId As String = "fb33996f-b318-410a-bede-903144c90e0c"
+        Dim MessageSentTime As String
+        If O("type") = "message" Then
+
+            dictobj.Add("type", "message")
+            dictobj.Add("FromConnId", connectionId)
+
+            dictobj.Add("FromName", O("FromName"))
+            dictobj.Add("message", O("message"))
+
+            If O("type") = "fileshare" Then
+                dictobj.Add("filename", O("filename"))
+            End If
+            ''Added by Meenatchi Sridharan on 02-April-2017
+
+            Using objEnt As New ChatEntities
+                Dim objChRoom As New ChatRoom
+
+                Dim RUserTo = From c In objEnt.ChatUsers.Where(Function(b) b.connId = ToConnId) Select c
+                For Each item In RUserTo
+                    UserTo = item.PFNum
+                Next
+                If ToConnId.Length <= 4 Then
+                    UserTo = ToConnId
+                End If
+
+                Dim RUserFrom = From c In objEnt.ChatUsers.Where(Function(b) b.connId = connectionId) Select c
+                For Each item In RUserFrom
+                    UserFrom = item.PFNum
+                Next
+
+                Dim encode As Byte() = New Byte(O("message").ToString().Length - 1) {}
+                encode = Encoding.UTF8.GetBytes(O("message").ToString())
+                Dim mesSentTime As DateTime
+                Dim recordexists = (From c In objEnt.ChatRoom.Where(Function(x) x.SenderID = UserFrom And x.ReceiverID = UserTo Or x.SenderID = UserTo And x.ReceiverID = UserFrom)).Count
+                If recordexists > 0 Then
+                    objChRoom = (From c In objEnt.ChatRoom.Where(Function(x) x.SenderID = UserFrom And x.ReceiverID = UserTo Or x.SenderID = UserTo And x.ReceiverID = UserFrom)).FirstOrDefault
+                    If objChRoom IsNot Nothing Then
+                        '' If record exists get the roomid of that chat window 
+                        '' Insert the messages to the table with roomid
+
+                        Dim objmsg As New ChatMessages
+                        '  objmsg.Message = O("message").ToString()
+                        objmsg.Message = Convert.ToBase64String(encode)
+                        objmsg.IsActive = True
+                        objmsg.CreatedOn = DateTime.Now
+                        objmsg.IsDeleted = False
+                        objmsg.IsPrivate = True
+                        objEnt.ChatMessages.Add(objmsg)
+                        objEnt.SaveChanges()
+                        MsgID = objmsg.MessageID
+
+                        mesSentTime = (From c In objEnt.ChatMessages.Where(Function(x) x.MessageID = MsgID) Select c.CreatedOn).FirstOrDefault
+                        ' MessageSentTime = mesSentTime.ToString("HH:mm")
+                        MessageSentTime = mesSentTime.ToString("dd-MM-yyyy HH:mm")
+
+                        Dim objMapping As New ChatMapping
+                        objMapping.MessageID = MsgID
+                        objMapping.RoomID = objChRoom.RoomID
+                        objMapping.PFNum = UserFrom
+                        objMapping.ChatAttachID = 0
+                        objMapping.IsRead = msgReadStatus
+                        objEnt.ChatMapping.Add(objMapping)
+                        objEnt.SaveChanges()
+
+                        dictobj.Add("timeSent", MessageSentTime.ToString)
+                    End If
+                Else
+                    Dim objChRoom1 As New ChatRoom
+                    objChRoom1.ReceiverID = UserTo
+                    objChRoom1.SenderID = UserFrom
+                    objChRoom1.RoomName = UserFrom & "-" & UserTo
+                    objEnt.ChatRoom.Add(objChRoom1)
+                    objEnt.SaveChanges()
+                    Roomid = objChRoom1.RoomID
+
+                    Dim objMsg As New ChatMessages
+                    '  objMsg.Message = O("message").ToString()
+                    objMsg.Message = Convert.ToBase64String(encode)
+                    objMsg.IsActive = True
+                    objMsg.CreatedOn = DateTime.Now
+                    objMsg.IsDeleted = False
+                    objMsg.IsPrivate = True
+                    objEnt.ChatMessages.Add(objMsg)
+                    objEnt.SaveChanges()
+                    MsgID = objMsg.MessageID
+
+                    mesSentTime = (From c In objEnt.ChatMessages.Where(Function(x) x.MessageID = MsgID) Select c.CreatedOn).FirstOrDefault
+                    '  MessageSentTime = mesSentTime.ToString("HH:mm")
+                    MessageSentTime = mesSentTime.ToString("dd-MM-yyyy HH:mm")
+
+                    Dim objMapping As New ChatMapping
+                    objMapping.MessageID = MsgID
+                    objMapping.RoomID = Roomid
+                    objMapping.PFNum = UserFrom
+                    objMapping.ChatAttachID = 0
+                    objMapping.IsRead = msgReadStatus
+                    objEnt.ChatMapping.Add(objMapping)
+                    objEnt.SaveChanges()
+
+                    dictobj.Add("timeSent", MessageSentTime.ToString)
+                End If
+
+            End Using
+        ElseIf O("type") = "history" Then
+            Dim fromdate As DateTime, todate As DateTime
+            fromdate = O("fromdate")
+            todate = fromdate.AddDays(-7)
+            Dim Gettilldate As String = String.Empty
+
+            Using objEnt As New ChatEntities
+                Dim objChRoom As New ChatRoom
+                UserTo = ToConnId
+                Dim RUserFrom = From c In objEnt.ChatUsers.Where(Function(b) b.connId = connectionId) Select c
+                For Each item In RUserFrom
+                    UserFrom = item.PFNum
+                Next
+                Dim recordexists = (From c In objEnt.ChatRoom.Where(Function(x) x.SenderID = UserFrom And x.ReceiverID = UserTo Or x.SenderID = UserTo And x.ReceiverID = UserFrom)).Count
+                If recordexists > 0 Then
+                    objChRoom = (From c In objEnt.ChatRoom.Where(Function(x) x.SenderID = UserFrom And x.ReceiverID = UserTo Or x.SenderID = UserTo And x.ReceiverID = UserFrom)).FirstOrDefault
+                    If objChRoom IsNot Nothing Then
+                        'Dim query = (From mp In objEnt.ChatMapping
+                        '             Join mg In objEnt.ChatMessages On mp.MessageID Equals (mg.MessageID) Where mp.RoomID = objChRoom.RoomID Order By mg.CreatedOn Descending Select New With {mg.Message, mg.MessageID, mp.PFNum}).Take(15).ToList()
+                        Dim query = (From mp In objEnt.ChatMapping
+                                     Join mg In objEnt.ChatMessages On mp.MessageID Equals (mg.MessageID) Where mp.RoomID = objChRoom.RoomID Order By mg.CreatedOn Descending Select New With {mg.Message, mg.MessageID, mp.PFNum, mp.ChatAttachID, mg.CreatedOn}).Take(30).ToList()
+
+                        query = query.OrderBy(Function(x) x.MessageID).ToList()
+
+                        Dim attachment As New Dictionary(Of String, String)
+
+                        For Each itm In query
+                            '' include $ to identify timestamp of the message
+                            Dim MsgSentOn As DateTime = itm.CreatedOn
+                            Dim msgsentTime As String = String.Empty
+                            ' msgsentTime = MsgSentOn.ToString("HH:mm")
+                            msgsentTime = MsgSentOn.ToString("dd-MM-yyyy HH:mm")
+                            If String.IsNullOrEmpty(Gettilldate) Then
+                                Gettilldate = msgsentTime
+                            End If
+
+
+
+                            Dim key As String = itm.PFNum & "-" & itm.MessageID & "#" & msgsentTime & "$"
+
+                            If itm.ChatAttachID <> 0 Then
+                                Dim objFilename = (From c In objEnt.ChatAttachments.Where(Function(x) x.ChatAttachID = itm.ChatAttachID) Select c.FileName).FirstOrDefault
+
+                                key = key & "@"
+                                message.Add(key, objFilename)
+
+                            Else
+                                message.Add(key, Decryptdata(itm.Message))
+                            End If
+
+                        Next
+
+                        dictobj.Add("type", "history")
+                        dictobj.Add("FromConnId", connectionId)
+                        dictobj.Add("messages", message)
+                        dictobj.Add("pfnum", UserTo)
+                        ' dictobj.Add("todate", todate)
+                        If Not String.IsNullOrEmpty(Gettilldate) Then
+                            dictobj.Add("todate", Gettilldate)
+                        Else
+                            dictobj.Add("todate", todate)
+                        End If
+
+
+                    End If
+
+                End If
+                ToConnId = (From c In objEnt.ChatUsers.Where(Function(x) x.PFNum = ToConnId) Select c.connId).FirstOrDefault
+
+
+            End Using
+
+        ElseIf O("type") = "fileshare" Then
+            dictobj.Add("type", "message")
+            dictobj.Add("FromConnId", connectionId)
+
+            dictobj.Add("FromName", O("FromName"))
+            dictobj.Add("message", O("message"))
+            dictobj.Add("filename", O("filename"))
+            dictobj.Add("AttachID", O("AttachID"))
+
+            Using objEnt As New ChatEntities
+                Dim objChRoom As New ChatRoom
+
+                Dim RUserTo = From c In objEnt.ChatUsers.Where(Function(b) b.connId = ToConnId) Select c
+                For Each item In RUserTo
+                    UserTo = item.PFNum
+                Next
+                Dim RUserFrom = From c In objEnt.ChatUsers.Where(Function(b) b.connId = connectionId) Select c
+                For Each item In RUserFrom
+                    UserFrom = item.PFNum
+                Next
+
+                Dim encode As Byte() = New Byte(O("message").ToString().Length - 1) {}
+                encode = Encoding.UTF8.GetBytes(O("message").ToString())
+
+                Dim recordexists = (From c In objEnt.ChatRoom.Where(Function(x) x.SenderID = UserFrom And x.ReceiverID = UserTo Or x.SenderID = UserTo And x.ReceiverID = UserFrom)).Count
+                If recordexists > 0 Then
+                    objChRoom = (From c In objEnt.ChatRoom.Where(Function(x) x.SenderID = UserFrom And x.ReceiverID = UserTo Or x.SenderID = UserTo And x.ReceiverID = UserFrom)).FirstOrDefault
+                    If objChRoom IsNot Nothing Then
+                        '' If record exists get the roomid of that chat window 
+                        '' Insert the messages to the table with roomid
+
+                        Dim objmsg As New ChatMessages
+                        '  objmsg.Message = O("message").ToString()
+                        objmsg.Message = Convert.ToBase64String(encode)
+                        objmsg.IsActive = True
+                        objmsg.CreatedOn = DateTime.Now
+                        objmsg.IsDeleted = False
+                        objmsg.IsPrivate = True
+                        objEnt.ChatMessages.Add(objmsg)
+                        objEnt.SaveChanges()
+                        MsgID = objmsg.MessageID
+
+                        Dim objMapping As New ChatMapping
+                        objMapping.MessageID = MsgID
+                        objMapping.RoomID = objChRoom.RoomID
+                        objMapping.PFNum = UserFrom
+                        If O("AttachID") <> 0 Then
+                            objMapping.ChatAttachID = Convert.ToInt64(O("AttachID"))
+                        Else
+                            objMapping.ChatAttachID = 0
+                        End If
+
+                        objEnt.ChatMapping.Add(objMapping)
+                        objEnt.SaveChanges()
+
+                    End If
+                Else
+                    Dim objChRoom1 As New ChatRoom
+                    objChRoom1.ReceiverID = UserTo
+                    objChRoom1.SenderID = UserFrom
+                    objChRoom1.RoomName = UserFrom & "-" & UserTo
+                    objEnt.ChatRoom.Add(objChRoom1)
+                    objEnt.SaveChanges()
+                    Roomid = objChRoom1.RoomID
+
+                    Dim objMsg As New ChatMessages
+                    '  objMsg.Message = O("message").ToString()
+                    objMsg.Message = Convert.ToBase64String(encode)
+                    objMsg.IsActive = True
+                    objMsg.CreatedOn = DateTime.Now
+                    objMsg.IsDeleted = False
+                    objMsg.IsPrivate = True
+                    objEnt.ChatMessages.Add(objMsg)
+                    objEnt.SaveChanges()
+                    MsgID = objMsg.MessageID
+
+                    Dim objMapping As New ChatMapping
+                    objMapping.MessageID = MsgID
+                    objMapping.RoomID = Roomid
+                    objMapping.PFNum = UserFrom
+                    If O("AttachID") <> 0 Then
+                        objMapping.ChatAttachID = Convert.ToInt64(O("AttachID"))
+                    Else
+                        objMapping.ChatAttachID = 0
+                    End If
+                    objEnt.ChatMapping.Add(objMapping)
+                    objEnt.SaveChanges()
+
+
+                End If
+
+            End Using
+
+        ElseIf O("type") = "ondemand" Then
+            Dim fromdate As DateTime, todate As DateTime
+            fromdate = O("fromdate")
+            todate = fromdate.AddDays(-7)
+            Dim Gettilldate As String = String.Empty
+            Using objEnt As New ChatEntities
+                Dim objChRoom As New ChatRoom
+                UserTo = ToConnId
+                Dim RUserFrom = From c In objEnt.ChatUsers.Where(Function(b) b.connId = connectionId) Select c
+                For Each item In RUserFrom
+                    UserFrom = item.PFNum
+                Next
+                Dim recordexists = (From c In objEnt.ChatRoom.Where(Function(x) x.SenderID = UserFrom And x.ReceiverID = UserTo Or x.SenderID = UserTo And x.ReceiverID = UserFrom)).Count
+                If recordexists > 0 Then
+                    objChRoom = (From c In objEnt.ChatRoom.Where(Function(x) x.SenderID = UserFrom And x.ReceiverID = UserTo Or x.SenderID = UserTo And x.ReceiverID = UserFrom)).FirstOrDefault
+                    If objChRoom IsNot Nothing Then
+                        'Dim query = (From mp In objEnt.ChatMapping
+                        '             Join mg In objEnt.ChatMessages On mp.MessageID Equals (mg.MessageID) Where mp.RoomID = objChRoom.RoomID Order By mg.CreatedOn Descending Select New With {mg.Message, mg.MessageID, mp.PFNum}).Take(15).ToList()
+                        'Dim query = (From mp In objEnt.ChatMapping
+                        '             Join mg In objEnt.ChatMessages On mp.MessageID Equals (mg.MessageID) Where mp.RoomID = objChRoom.RoomID AndAlso (mg.CreatedOn >= todate And mg.CreatedOn <= fromdate) Order By mg.CreatedOn Descending Select New With {mg.Message, mg.MessageID, mp.PFNum, mp.ChatAttachID, mg.CreatedOn}).ToList()
+                        Dim query = (From mp In objEnt.ChatMapping
+                                     Join mg In objEnt.ChatMessages On mp.MessageID Equals (mg.MessageID) Where mp.RoomID = objChRoom.RoomID AndAlso (mg.CreatedOn <= fromdate) Order By mg.CreatedOn Descending Select New With {mg.Message, mg.MessageID, mp.PFNum, mp.ChatAttachID, mg.CreatedOn}).Take(30).ToList()
+
+                        query = query.OrderBy(Function(x) x.MessageID).ToList()
+
+                        Dim attachment As New Dictionary(Of String, String)
+
+                        For Each itm In query
+                            '' include $ to identify timestamp of the message
+                            Dim MsgSentOn As DateTime = itm.CreatedOn
+                            Dim msgsentTime As String = String.Empty
+                            'msgsentTime = MsgSentOn.ToString("HH:mm")
+                            msgsentTime = MsgSentOn.ToString("dd-MM-yyyy HH:mm")
+                            If String.IsNullOrEmpty(Gettilldate) Then
+                                Gettilldate = msgsentTime
+                            End If
+
+                            ' Dim key As String = itm.PFNum & "-" & itm.MessageID 
+                            Dim key As String = itm.PFNum & "-" & itm.MessageID & "#" & msgsentTime & "$"
+
+                            If itm.ChatAttachID <> 0 Then
+                                Dim objFilename = (From c In objEnt.ChatAttachments.Where(Function(x) x.ChatAttachID = itm.ChatAttachID) Select c.FileName).FirstOrDefault
+
+                                key = key & "@"
+                                message.Add(key, objFilename)
+
+                            Else
+                                message.Add(key, Decryptdata(itm.Message))
+                            End If
+
+                        Next
+
+                        dictobj.Add("type", "ondemand")
+                        dictobj.Add("FromConnId", connectionId)
+                        dictobj.Add("messages", message)
+                        dictobj.Add("pfnum", UserTo)
+                        ' dictobj.Add("todate", todate)
+                        If Not String.IsNullOrEmpty(Gettilldate) Then
+                            dictobj.Add("todate", Gettilldate)
+                        Else
+                            dictobj.Add("todate", todate)
+                        End If
+
+                    End If
+
+                End If
+                ToConnId = (From c In objEnt.ChatUsers.Where(Function(x) x.PFNum = ToConnId) Select c.connId).FirstOrDefault
+
+
+            End Using
+
+        End If
+        If O("type") = "history" Then
+            connectionId = connectionId
+        ElseIf O("type") = "message" Then
+            connectionId = ToConnId
+        ElseIf O("type") = "fileshare" Then
+            connectionId = ToConnId
+        ElseIf O("type") = "ondemand" Then
+            connectionId = connectionId
+        End If
+
+
+        Return MyBase.Connection.Send(connectionId, dictobj)    'Return MyBase.Connection.Send(connectionId, dictobj)
+        'Return MyBase.Connection.Send(ToConnId, message)
+
+
+    End Function
+    Private Function Decryptdata(encryptmsg As String) As String
+        Dim decryptpwd As String = String.Empty
+        Dim encodepwd As New UTF8Encoding()
+        Dim Decode As Decoder = encodepwd.GetDecoder()
+        Dim todecode_byte As Byte() = Convert.FromBase64String(encryptmsg)
+        Dim charCount As Integer = Decode.GetCharCount(todecode_byte, 0, todecode_byte.Length)
+        Dim decoded_char As Char() = New Char(charCount - 1) {}
+        Decode.GetChars(todecode_byte, 0, todecode_byte.Length, decoded_char, 0)
+        decryptpwd = New [String](decoded_char)
+        Return decryptpwd
+    End Function
+
+End Class
+
+Structure ChatUser
+    Dim connId As String
+    Dim pfnum As Integer
+    Dim username As String
+    Dim IsOnline As Boolean
+End Structure
